@@ -3,256 +3,240 @@ import datetime
 
 st.set_page_config(page_title="Friday – Finance Assistant", layout="wide")
 
-st.title("💼 Friday – Finance & Tax Assistant")
+# ======================================================
+# SIDEBAR (NAVIGATION)
+# ======================================================
+
+st.sidebar.title("🤖 Friday Assistant")
+
+menu = st.sidebar.radio(
+    "Go to",
+    [
+        "🏠 Home",
+        "🏦 EMI Calculator",
+        "🧮 Calculator",
+        "📘 Taxation Hub",
+        "📝 Notes",
+        "🌐 Portals"
+    ]
+)
+
+st.sidebar.markdown("---")
+st.sidebar.info("Built for CA / Finance Professionals")
 
 
-# =====================================================
-# EMI CALCULATOR
-# =====================================================
+# ======================================================
+# HOME PAGE
+# ======================================================
 
-st.header("🏦 EMI Calculator")
+if menu == "🏠 Home":
 
-def calculate_emi(p, r, y):
-    r = r/12/100
-    n = y*12
-    emi = p*r*(1+r)**n/((1+r)**n-1)
-    return round(emi, 0)
+    st.title("💼 Friday – Finance & Tax Assistant")
 
-col1, col2, col3 = st.columns(3)
+    col1, col2, col3 = st.columns(3)
 
-with col1:
-    loan = st.number_input("Loan Amount (₹)", value=2000000)
+    col1.metric("Tools", "6")
+    col2.metric("Modules", "Finance + Tax")
+    col3.metric("Status", "Live 🚀")
 
-with col2:
-    rate = st.number_input("Interest %", value=10.0)
+    st.write("""
+    ### Welcome!
+    This is your personal **Finance Automation Dashboard**.
 
-with col3:
-    years = st.number_input("Years", value=5)
-
-if st.button("Calculate EMI"):
-    emi = calculate_emi(loan, rate, years)
-    total = emi*years*12
-    st.success(f"Monthly EMI = ₹{emi:,.0f}")
-    st.info(f"Total Payment = ₹{total:,.0f}")
+    Use left menu to:
+    - Calculate EMI
+    - Do quick maths
+    - Check TDS sections
+    - Save notes
+    - Open portals
+    """)
 
 
-# =====================================================
-# CALCULATOR
-# =====================================================
+# ======================================================
+# EMI PAGE
+# ======================================================
 
-st.header("🧮 Quick Calculator")
+elif menu == "🏦 EMI Calculator":
 
-expr = st.text_input("Enter math (example: 20*0.01*100)")
+    st.title("🏦 EMI Calculator")
 
-if st.button("Compute"):
-    try:
-        result = eval(expr)
-        st.success(result)
-    except:
-        st.error("Invalid expression")
+    def calculate_emi(p, r, y):
+        r = r/12/100
+        n = y*12
+        emi = p*r*(1+r)**n/((1+r)**n-1)
+        return round(emi, 0)
 
+    c1, c2, c3 = st.columns(3)
 
-# =====================================================
-# QUICK LINKS
-# =====================================================
+    with c1:
+        loan = st.number_input("Loan (₹)", value=2000000)
 
-st.header("🌐 Quick Portals")
+    with c2:
+        rate = st.number_input("Rate %", value=10.0)
 
-st.link_button("NSE", "https://www.nseindia.com")
-st.link_button("GST Portal", "https://www.gst.gov.in")
-st.link_button("ITR Portal", "https://www.incometax.gov.in")
-st.link_button("Screener", "https://www.screener.in")
+    with c3:
+        years = st.number_input("Years", value=5)
 
-
-# =====================================================
-# NOTES
-# =====================================================
-
-st.header("📝 Notes")
-
-note = st.text_area("Write note")
-
-if st.button("Save Note"):
-    with open("notes.txt", "a", encoding="utf-8") as f:
-        f.write(f"{datetime.datetime.now()} - {note}\n")
-    st.success("Saved")
+    if st.button("Calculate"):
+        emi = calculate_emi(loan, rate, years)
+        total = emi*years*12
+        st.success(f"Monthly EMI: ₹{emi:,.0f}")
+        st.info(f"Total Payment: ₹{total:,.0f}")
 
 
-# =====================================================
-# TAXATION HUB
-# =====================================================
+# ======================================================
+# CALCULATOR PAGE
+# ======================================================
 
-st.header("📘 Taxation Hub")
+elif menu == "🧮 Calculator":
 
-tab1, tab2 = st.tabs(["Direct Tax – TDS Handbook", "GST – Coming Soon"])
+    st.title("🧮 Quick Calculator")
+
+    expr = st.text_input("Enter expression (example: 20*0.01*100)")
+
+    if st.button("Compute"):
+        try:
+            st.success(eval(expr))
+        except:
+            st.error("Invalid expression")
 
 
-# =====================================================
-# FULL TDS HANDBOOK (DETAILED + COMPLETE)
-# =====================================================
+# ======================================================
+# ======================================================
+# TAXATION HUB – CLEAR TAX STYLE (EXPANDABLE CARDS)
+# ======================================================
 
-with tab1:
+elif menu == "📘 Taxation Hub":
 
-    st.subheader("📚 Complete TDS Compliance Handbook")
-    st.info("Search any section → click to view full applicability, rate, forms & notes")
+    st.title("📘 TDS Handbook – Detailed (FY 2025-26)")
+    st.caption("Based on ClearTax TDS rate chart – thresholds & amended rates")
 
-    tds_sections = [
+    search = st.text_input("🔍 Search section or payment type")
 
-    {
-    "Section":"192",
-    "Nature":"Salary",
-    "Who deducts":"Employer",
-    "Threshold":"Basic exemption",
-    "Rate":"Slab rates",
-    "Deposit":"7th next month",
-    "Return":"24Q",
-    "Certificate":"Form 16",
-    "Notes":"Monthly TDS based on estimated tax"
-    },
+    tds_data = [
 
-    {
-    "Section":"192A",
-    "Nature":"EPF premature withdrawal",
-    "Threshold":"₹50,000",
-    "Rate":"10%",
-    "Return":"26Q"
-    },
+    {"Section":"192","Nature":"Salary","Threshold":"Basic exemption limit",
+     "Rate":"Slab rates","Notes":"Employer deducts monthly TDS on estimated income"},
 
-    {
-    "Section":"193",
-    "Nature":"Interest on securities",
-    "Threshold":"₹10,000",
-    "Rate":"10%",
-    "Return":"26Q"
-    },
+    {"Section":"192A","Nature":"EPF premature withdrawal","Threshold":"₹50,000",
+     "Rate":"10%","Notes":"If service < 5 years"},
 
-    {
-    "Section":"194A",
-    "Nature":"Bank/FD interest",
-    "Threshold":"₹40k/₹50k senior",
-    "Rate":"10%",
-    "Return":"26Q",
-    "Notes":"15G/15H allowed"
-    },
+    {"Section":"193","Nature":"Interest on securities","Threshold":"₹10,000",
+     "Rate":"10%","Notes":"Govt securities/bonds"},
 
-    {
-    "Section":"194B",
-    "Nature":"Lottery/gambling winnings",
-    "Threshold":"₹10,000",
-    "Rate":"30%"
-    },
+    {"Section":"194","Nature":"Dividend","Threshold":"₹10,000",
+     "Rate":"10%","Notes":"Dividend payments by companies/MFs"},
 
-    {
-    "Section":"194C",
-    "Nature":"Contractor/Sub-contractor",
-    "Threshold":"₹30k single / ₹1L yearly",
-    "Rate":"1%/2%",
-    "Return":"26Q"
-    },
+    {"Section":"194A","Nature":"Interest other than securities",
+     "Threshold":"₹40k / ₹50k (senior)",
+     "Rate":"10%","Notes":"Bank/FD interest, Form 15G/15H allowed"},
 
-    {
-    "Section":"194D",
-    "Nature":"Insurance commission",
-    "Threshold":"₹15,000",
-    "Rate":"5%"
-    },
+    {"Section":"194B","Nature":"Lottery/Gambling winnings","Threshold":"₹10,000",
+     "Rate":"30%","Notes":"Flat rate, no deduction allowed"},
 
-    {
-    "Section":"194H",
-    "Nature":"Commission/Brokerage",
-    "Threshold":"₹15,000",
-    "Rate":"5%"
-    },
+    {"Section":"194BA","Nature":"Online gaming winnings","Threshold":"₹10,000",
+     "Rate":"30%","Notes":"Online games, fantasy apps etc"},
 
-    {
-    "Section":"194I",
-    "Nature":"Rent",
-    "Threshold":"₹2.4 lakh yearly",
-    "Rate":"10% building / 2% plant",
-    "Return":"26Q"
-    },
+    {"Section":"194BB","Nature":"Horse race winnings","Threshold":"₹10,000",
+     "Rate":"30%"},
 
-    {
-    "Section":"194J",
-    "Nature":"Professional/Technical fees",
-    "Threshold":"₹30,000",
-    "Rate":"10%/2%",
-    "Return":"26Q"
-    },
+    {"Section":"194C","Nature":"Contractor/Sub-contractor",
+     "Threshold":"₹30k single / ₹1L yearly",
+     "Rate":"1% (Ind/HUF), 2% (Others)","Notes":"Transporters with PAN exempt"},
 
-    {
-    "Section":"194K",
-    "Nature":"Mutual fund income",
-    "Threshold":"₹5,000",
-    "Rate":"10%"
-    },
+    {"Section":"194D","Nature":"Insurance commission","Threshold":"₹15,000",
+     "Rate":"5%"},
 
-    {
-    "Section":"194Q",
-    "Nature":"Purchase of goods",
-    "Threshold":"₹50 lakh",
-    "Rate":"0.1%",
-    "Notes":"Buyer turnover > ₹10Cr"
-    },
+    {"Section":"194DA","Nature":"Life insurance payout","Threshold":"₹1,00,000",
+     "Rate":"5% (income portion)"},
 
-    {
-    "Section":"194R",
-    "Nature":"Business benefit/perquisite",
-    "Threshold":"₹20,000",
-    "Rate":"10%"
-    },
+    {"Section":"194EE","Nature":"NSS withdrawal","Threshold":"₹2,500",
+     "Rate":"10%"},
 
-    {
-    "Section":"194S",
-    "Nature":"Crypto/Virtual assets",
-    "Threshold":"₹10k/₹50k",
-    "Rate":"1%"
-    },
+    {"Section":"194G","Nature":"Lottery commission","Threshold":"₹20,000",
+     "Rate":"2%"},
 
-    {
-    "Section":"194IA",
-    "Nature":"Property purchase",
-    "Threshold":"₹50 lakh property",
-    "Rate":"1%",
-    "Form":"26QB"
-    },
+    {"Section":"194H","Nature":"Commission/Brokerage","Threshold":"₹20,000",
+     "Rate":"2%"},
 
-    {
-    "Section":"194M",
-    "Nature":"High value payment by Individual/HUF",
-    "Threshold":"₹50 lakh yearly",
-    "Rate":"5%",
-    "Form":"26QD"
-    },
+    {"Section":"194I","Nature":"Rent – building/land","Threshold":"₹2.4 lakh",
+     "Rate":"10%"},
 
-    {
-    "Section":"195",
-    "Nature":"Payment to Non-resident",
-    "Threshold":"No limit",
-    "Rate":"DTAA/Act",
-    "Return":"27Q"
-    },
+    {"Section":"194I","Nature":"Rent – plant/machinery","Threshold":"₹2.4 lakh",
+     "Rate":"2%"},
 
-    {
-    "Section":"206C(1H)",
-    "Nature":"TCS on sale of goods",
-    "Threshold":"₹50 lakh sale",
-    "Rate":"0.1%",
-    "Return":"27EQ"
-    }
+    {"Section":"194J","Nature":"Professional fees","Threshold":"₹30,000",
+     "Rate":"10%"},
+
+    {"Section":"194J","Nature":"Technical services","Threshold":"₹30,000",
+     "Rate":"2%"},
+
+    {"Section":"194K","Nature":"Mutual fund income","Threshold":"₹5,000",
+     "Rate":"10%"},
+
+    {"Section":"194LA","Nature":"Land acquisition compensation","Threshold":"₹2.5 lakh",
+     "Rate":"10%"},
+
+    {"Section":"194M","Nature":"High value contract/professional by Individual/HUF",
+     "Threshold":"₹50 lakh",
+     "Rate":"5%"},
+
+    {"Section":"194N","Nature":"Cash withdrawal","Threshold":"₹1 crore (₹20L no ITR)",
+     "Rate":"2%/5%","Notes":"Bank withdrawals"},
+
+    {"Section":"194O","Nature":"E-commerce operator","Threshold":"₹5 lakh",
+     "Rate":"1%"},
+
+    {"Section":"194Q","Nature":"Purchase of goods","Threshold":"₹50 lakh",
+     "Rate":"0.1%","Notes":"Buyer turnover > ₹10 Cr"},
+
+    {"Section":"194R","Nature":"Business benefit/perquisite","Threshold":"₹20,000",
+     "Rate":"10%"},
+
+    {"Section":"194S","Nature":"Crypto/Virtual Digital Asset","Threshold":"₹10k/₹50k",
+     "Rate":"1%"},
+
+    {"Section":"195","Nature":"Payment to Non-resident","Threshold":"No limit",
+     "Rate":"As per DTAA/Act","Notes":"Return 27Q"},
+
     ]
 
-    search = st.text_input("🔍 Search section or keyword")
-
-    for row in tds_sections:
-        text = str(row).lower()
+    for row in tds_data:
+        text = f"{row['Section']} {row['Nature']}".lower()
 
         if search.lower() in text or search == "":
             with st.expander(f"{row['Section']} – {row['Nature']}"):
-                for k, v in row.items():
-                    if k not in ["Section", "Nature"]:
-                        st.write(f"**{k}:** {v}")
+                st.write(f"**Threshold:** {row['Threshold']}")
+                st.write(f"**Rate:** {row['Rate']}")
+                if "Notes" in row:
+                    st.write(f"**Notes:** {row['Notes']}")
 
 
-with tab2:
-    st.info("GST section coming next (rates, returns, due dates, interest & penalties)")
+# ======================================================
+# NOTES
+# ======================================================
+
+elif menu == "📝 Notes":
+
+    st.title("📝 Notes")
+
+    note = st.text_area("Write your note")
+
+    if st.button("Save"):
+        with open("notes.txt", "a") as f:
+            f.write(f"{datetime.datetime.now()} - {note}\n")
+        st.success("Saved")
+
+
+# ======================================================
+# PORTALS
+# ======================================================
+
+elif menu == "🌐 Portals":
+
+    st.title("🌐 Quick Portals")
+
+    st.link_button("NSE", "https://www.nseindia.com")
+    st.link_button("GST Portal", "https://www.gst.gov.in")
+    st.link_button("ITR Portal", "https://www.incometax.gov.in")
+    st.link_button("Screener", "https://www.screener.in")
