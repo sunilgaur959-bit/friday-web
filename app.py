@@ -1,7 +1,13 @@
 import streamlit as st
 import datetime
 
+
+
 st.set_page_config(page_title="Friday – Finance Assistant", layout="wide")
+
+# ===== Navigation helper =====
+page = st.query_params.get("page", "")
+default_menu = "📊 GST Reconciliation" if page == "gst" else "🏠 Home"
 
 # ======================================================
 # SIDEBAR (NAVIGATION)
@@ -21,7 +27,7 @@ menu = st.sidebar.radio(
         "📊 GST Reconciliation",
 
     ],
-    key="menu"
+    index=4 if default_menu == "📊 GST Reconciliation" else 0
 )
 
 st.sidebar.markdown("---")
@@ -93,7 +99,8 @@ if menu == "🏠 Home":
     b1, b2, b3 = st.columns(3)
 
     if b1.button("📊 Run GST Reconciliation"):
-        st.session_state["menu"] = "📊 GST Reconciliation"
+        st.query_params["page"] = "gst"
+        st.rerun()
 
 
     if b2.button("📘 View TDS Handbook"):
