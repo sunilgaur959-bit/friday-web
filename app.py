@@ -20,7 +20,8 @@ menu = st.sidebar.radio(
         "🌐 Portals",
         "📊 GST Reconciliation",
 
-    ]
+    ],
+    key="menu"
 )
 
 st.sidebar.markdown("---")
@@ -92,7 +93,8 @@ if menu == "🏠 Home":
     b1, b2, b3 = st.columns(3)
 
     if b1.button("📊 Run GST Reconciliation"):
-        st.switch_page("📊 GST Reconciliation")
+        st.session_state["menu"] = "📊 GST Reconciliation"
+
 
     if b2.button("📘 View TDS Handbook"):
         st.switch_page("📘 Taxation Hub")
