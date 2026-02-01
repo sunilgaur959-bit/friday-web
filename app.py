@@ -495,9 +495,8 @@ elif menu == "📊 GST Reconciliation":
 
             start_time = time.time()
 
-            gstr2b = read_sheet_safely(uploaded_file, "GSTR_2B")
-            books  = read_sheet_safely(uploaded_file, "BOOKS")
-
+            gstr2b = pd.read_excel(uploaded_file, sheet_name="GSTR_2B")
+            books = pd.read_excel(uploaded_file, sheet_name="BOOKS")
 
 
             gstr2b = normalise_columns(gstr2b)
@@ -583,8 +582,7 @@ elif menu == "📊 GST Reconciliation":
             # ==============================
 
             output = BytesIO()
-            with pd.ExcelWriter("GST_Reco_Reconciled.xlsx", engine="openpyxl") as writer:
-
+            with pd.ExcelWriter(output, engine="openpyxl") as writer:
                 gstr2b.to_excel(writer, sheet_name="GSTR_2B", index=False)
                 books.to_excel(writer, sheet_name="BOOKS", index=False)
 
