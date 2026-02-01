@@ -6,7 +6,7 @@ import pandas as pd
 from io import BytesIO
 
 def create_gst_template():
-    cols = ["Supplier_Name", "Invoice_No", "IGST", "CGST", "SGST"]
+    cols = ["Supplier_Name", "GSTIN", "Invoice_Date", "Invoice_No", "IGST", "CGST", "SGST"]
 
     sample = pd.DataFrame([
         ["ABC Traders", "INV001", 1800, 0, 0],
