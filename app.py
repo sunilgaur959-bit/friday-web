@@ -31,27 +31,74 @@ st.sidebar.info("Built for CA / Finance Professionals")
 # HOME PAGE
 # ======================================================
 
+# ======================================================
+# 🏠 HOME DASHBOARD (PROFESSIONAL)
+# ======================================================
+
 if menu == "🏠 Home":
 
-    st.title("💼 Friday – Finance & Tax Assistant")
+    import pandas as pd
+    import plotly.express as px
+    import os
 
-    col1, col2, col3 = st.columns(3)
+    st.title("💼 Friday – Finance Automation Dashboard")
 
-    col1.metric("Tools", "6")
-    col2.metric("Modules", "Finance + Tax")
-    col3.metric("Status", "Live 🚀")
+    st.markdown("### 📊 GST Reconciliation Summary")
 
-    st.write("""
-    ### Welcome!
-    This is your personal **Finance Automation Dashboard**.
+    output_file = "GST_Reco_Reconciled.xlsx"
 
-    Use left menu to:
-    - Calculate EMI
-    - Do quick maths
-    - Check TDS sections
-    - Save notes
-    - Open portals
-    """)
+    if os.path.exists(output_file):
+
+        books = pd.read_excel(output_file, sheet_name="BOOKS")
+
+        total = len(books)
+        matched = (books["RECO_REMARK"] == "MATCHED").sum()
+        unmatched = total - matched
+        percent = round((matched/total)*100, 2) if total else 0
+
+        # ======================
+        # METRICS CARDS
+        # ======================
+
+        c1, c2, c3, c4 = st.columns(4)
+
+        c1.metric("Total Invoices", total)
+        c2.metric("Matched", matched)
+        c3.metric("Unmatched", unmatched)
+        c4.metric("Match %", f"{percent}%")
+
+        # ======================
+        # PIE CHART
+        # ======================
+
+        chart_df = pd.DataFrame({
+            "Status": ["Matched", "Unmatched"],
+            "Count": [matched, unmatched]
+        })
+
+        fig = px.pie(chart_df, names="Status", values="Count", hole=0.5)
+        st.plotly_chart(fig, use_container_width=True)
+
+    else:
+        st.info("Run GST Reconciliation first to see dashboard metrics")
+
+    # ======================
+    # QUICK TOOLS
+    # ======================
+
+    st.markdown("---")
+    st.markdown("### ⚡ Quick Tools")
+
+    b1, b2, b3 = st.columns(3)
+
+    if b1.button("📊 Run GST Reconciliation"):
+        st.switch_page("📊 GST Reconciliation")
+
+    if b2.button("📘 View TDS Handbook"):
+        st.switch_page("📘 Taxation Hub")
+
+    if b3.button("🏦 EMI Calculator"):
+        st.switch_page("🏦 EMI Calculator")
 
 
 # ======================================================
