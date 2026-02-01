@@ -573,6 +573,29 @@ elif menu == "📊 GST Reconciliation":
                         gstr2b.loc[j, ["RECO_REMARK", "USED"]] = ["MATCHED", True]
                         break
 
+                # ================= STEP 4B — Tax amount fallback matching =================
+
+            status.text("🔁 Running fallback tax matching...")
+            progress.progress(90)
+
+            unmatched_books = books[~books["USED"]]
+
+            for i, b in unmatched_books.iterrows():
+
+                candidates = gstr2b[
+                    (~gstr2b["USED"]) &
+                    (gstr2b["TAX_STRUCTURE"] == b["TAX_STRUCTURE"]) &
+                    (abs(gstr2b["IGST"] - b["IGST"]) <= TOLERANCE) &
+                    (abs(gstr2b["CGST"] - b["CGST"]) <= TOLERANCE) &
+                    (abs(gstr2b["SGST"] - b["SGST"]) <= TOLERANCE)
+                ]
+
+                if len(candidates) >= 1:
+                    j = candidates.index[0]
+                    books.loc[i, ["RECO_REMARK", "USED"]] = ["MATCHED", True]
+                    gstr2b.loc[j, ["RECO_REMARK", "USED"]] = ["MATCHED", True]
+
+
             # STEP 5 — Finish
             progress.progress(100)
             status.success("✅ Reconciliation Completed")
