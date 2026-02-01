@@ -1,5 +1,6 @@
 import streamlit as st
 import datetime
+import time
 
 
 import pandas as pd
@@ -493,22 +494,34 @@ elif menu == "📊 GST Reconciliation":
     # RUN BUTTON
     # ==============================
 
+    # ==============================
+# RUN BUTTON
+# ==============================
+
     if uploaded_file:
 
         if st.button("Run Reconciliation"):
 
+            progress = st.progress(0)
+            status = st.empty()
             start_time = time.time()
 
+            # STEP 1 — Read files
             gstr2b = pd.read_excel(uploaded_file, sheet_name="GSTR_2B")
             books = pd.read_excel(uploaded_file, sheet_name="BOOKS")
+            status.text("📂 Files loaded")
+            progress.progress(15)
 
-
+            # STEP 2 — Clean data
             gstr2b = normalise_columns(gstr2b)
             books = normalise_columns(books)
 
             gstr2b = map_columns(gstr2b)
             books = map_columns(books)
+            status.text("🧹 Data cleaned")
+            progress.progress(35)
 
+            # STEP 3 — Prepare fields
             for df in [gstr2b, books]:
 
                 df["Invoice_No"] = df.get("Invoice_No", "")
@@ -521,16 +534,23 @@ elif menu == "📊 GST Reconciliation":
                 df["RECO_REMARK"] = "NOT MATCHED"
                 df["USED"] = False
 
+            status.text("⚙ Preparing reconciliation")
+            progress.progress(55)
+
+            # STEP 4 — Matching (dynamic)
             gstr2b["TAX_STRUCTURE"] = gstr2b.apply(tax_structure, axis=1)
             books["TAX_STRUCTURE"] = books.apply(tax_structure, axis=1)
 
-            # ==============================
-            # MATCHING LOGIC (UNCHANGED)
-            # ==============================
-
             books_grouped = books[books["Invoice_No_CLEAN"] != ""].groupby("Invoice_No_CLEAN")
 
+            total_groups = len(books_grouped)
+            done = 0
+
             for inv_no, grp in books_grouped:
+
+                done += 1
+                progress.progress(55 + int((done/total_groups)*35))
+                status.text(f"🔍 Matching {done}/{total_groups} invoices...")
 
                 igst_sum = grp["IGST"].sum()
                 cgst_sum = grp["CGST"].sum()
@@ -553,37 +573,15 @@ elif menu == "📊 GST Reconciliation":
                         gstr2b.loc[j, ["RECO_REMARK", "USED"]] = ["MATCHED", True]
                         break
 
-
-            unmatched_books = books[~books["USED"]]
-
-            for i, b in unmatched_books.iterrows():
-
-                candidates = gstr2b[
-                    (~gstr2b["USED"]) &
-                    (gstr2b["TAX_STRUCTURE"] == b["TAX_STRUCTURE"]) &
-                    (abs(gstr2b["IGST"] - b["IGST"]) <= TOLERANCE) &
-                    (abs(gstr2b["CGST"] - b["CGST"]) <= TOLERANCE) &
-                    (abs(gstr2b["SGST"] - b["SGST"]) <= TOLERANCE)
-                ]
-
-                if len(candidates) >= 1:
-                    j = candidates.index[0]
-                    books.loc[i, ["RECO_REMARK", "USED"]] = ["MATCHED", True]
-                    gstr2b.loc[j, ["RECO_REMARK", "USED"]] = ["MATCHED", True]
-
-            # ==============================
-            # SUMMARY
-            # ==============================
+            # STEP 5 — Finish
+            progress.progress(100)
+            status.success("✅ Reconciliation Completed")
 
             matched = (books["RECO_REMARK"] == "MATCHED").sum()
             total = len(books)
 
-            st.success(f"Matched: {matched} / {total}")
-            st.info(f"Time taken: {round(time.time()-start_time,2)} seconds")
-
-            # ==============================
-            # DOWNLOAD
-            # ==============================
+            st.success(f"Matched: {matched}/{total}")
+            st.info(f"Time taken: {round(time.time()-start_time,2)} sec")
 
             output = BytesIO()
             with pd.ExcelWriter(output, engine="openpyxl") as writer:
@@ -597,4 +595,5 @@ elif menu == "📊 GST Reconciliation":
                 output,
                 file_name="GST_Reco_Reconciled.xlsx"
             )
+
 
