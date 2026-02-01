@@ -1,13 +1,14 @@
 import streamlit as st
 import datetime
 
+# ===== Navigation state (simple & stable) =====
+if "menu" not in st.session_state:
+    st.session_state.menu = "🏠 Home"
+
 
 
 st.set_page_config(page_title="Friday – Finance Assistant", layout="wide")
 
-# ===== Navigation helper =====
-page = st.query_params.get("page", "")
-default_menu = "📊 GST Reconciliation" if page == "gst" else "🏠 Home"
 
 # ======================================================
 # SIDEBAR (NAVIGATION)
@@ -27,7 +28,7 @@ menu = st.sidebar.radio(
         "📊 GST Reconciliation",
 
     ],
-    index=4 if default_menu == "📊 GST Reconciliation" else 0
+    key="menu"
 )
 
 st.sidebar.markdown("---")
@@ -99,15 +100,17 @@ if menu == "🏠 Home":
     b1, b2, b3 = st.columns(3)
 
     if b1.button("📊 Run GST Reconciliation"):
-        st.query_params["page"] = "gst"
+        st.session_state.menu = "📊 GST Reconciliation"
         st.rerun()
 
-
     if b2.button("📘 View TDS Handbook"):
-        st.switch_page("📘 Taxation Hub")
+        st.session_state.menu = "📘 Taxation Hub"
+        st.rerun()
 
     if b3.button("🏦 EMI Calculator"):
-        st.switch_page("🏦 EMI Calculator")
+        st.session_state.menu = "🏦 EMI Calculator"
+        st.rerun()
+
 
 
 # ======================================================
@@ -121,6 +124,11 @@ elif menu == "🏦 EMI Calculator":
     def calculate_emi(p, r, y):
         r = r/12/100
         n = y*12
+
+        # zero interest fix
+        if r == 0:
+            return round(p/n, 0)
+
         emi = p*r*(1+r)**n/((1+r)**n-1)
         return round(emi, 0)
 
@@ -140,6 +148,7 @@ elif menu == "🏦 EMI Calculator":
         total = emi*years*12
         st.success(f"Monthly EMI: ₹{emi:,.0f}")
         st.info(f"Total Payment: ₹{total:,.0f}")
+
 
 
 # ======================================================
