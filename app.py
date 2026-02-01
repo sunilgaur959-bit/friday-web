@@ -6,12 +6,15 @@ import pandas as pd
 from io import BytesIO
 
 def create_gst_template():
-    cols = ["Supplier_Name", "GSTIN", "Invoice_Date", "Invoice_No", "IGST", "CGST", "SGST"]
-
-    sample = pd.DataFrame([
-        ["ABC Traders", "INV001", 1800, 0, 0],
-        ["XYZ Pvt Ltd", "BILL45", 0, 900, 900]
-    ], columns=cols)
+    sample = pd.DataFrame({
+        "Supplier_Name": ["ABC Traders", "XYZ Pvt Ltd"],
+        "GSTIN": ["27ABCDE1234F1Z5", "29PQRSX5678L1Z2"],
+        "Invoice_Date": ["01-01-2026", "02-01-2026"],
+        "Invoice_No": ["INV001", "BILL45"],
+        "IGST": [0, 0],
+        "CGST": [900, 450],
+        "SGST": [900, 450]
+    })
 
     output = BytesIO()
 
@@ -21,6 +24,7 @@ def create_gst_template():
 
     output.seek(0)
     return output
+
 
 
 # ===== Navigation state (simple & stable) =====
