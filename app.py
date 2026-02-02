@@ -1,4 +1,4 @@
-import streamlit as st
+    import streamlit as st
 import datetime
 import time
 
@@ -60,6 +60,46 @@ menu = st.sidebar.radio(
 
 st.sidebar.markdown("---")
 st.sidebar.info("Built for CA / Finance Professionals")
+with st.sidebar:
+    page = st.radio(
+        "Tools",
+        ["GST Reco", "Trial Balance", "TDS Calc", "History"]
+    )
+
+import pandas as pd
+import os
+
+if page == "History":
+
+    st.header("📜 Run History")
+
+    os.makedirs("history", exist_ok=True)
+    files = os.listdir("history")
+
+
+    if not files:
+        st.info("No history available yet")
+    else:
+        data = []
+
+        for f in files:
+            path = os.path.join("history", f)
+            size = round(os.path.getsize(path)/1024, 2)
+
+            data.append([f, size])
+
+        df = pd.DataFrame(data, columns=["File Name", "Size (KB)"])
+
+        st.dataframe(df, use_container_width=True)
+
+        for f in files:
+            with open(f"history/{f}", "rb") as file:
+                st.download_button(
+                    label=f"⬇ Download {f}",
+                    data=file,
+                    file_name=f
+        )
+
 
 
 # ======================================================
@@ -404,6 +444,7 @@ elif menu == "📊 GST Reconciliation":
         template_file,
         file_name="Friday_GST_Template.xlsx"
     )
+    
 
     st.markdown("---")
 
@@ -614,9 +655,26 @@ elif menu == "📊 GST Reconciliation":
             output.seek(0)
 
             st.download_button(
-                "⬇ Download Reconciled File",
-                output,
-                file_name="GST_Reco_Reconciled.xlsx"
+             "⬇ Download Reconciled File",
+                 output,
+                 file_name="GST_Reco_Reconciled.xlsx"
             )
 
+            # =============================
+            # AUTO SAVE TO HISTORY
+            # =============================
 
+            import os, datetime
+
+            os.makedirs("history", exist_ok=True)
+
+            timestamp = datetime.datetime.now().strftime("%d_%b_%Y_%H_%M")
+            filename = f"history/GST_Reco_{timestamp}.xlsx"
+
+            with pd.ExcelWriter(filename, engine="openpyxl") as writer:
+                gstr2b.to_excel(writer, sheet_name="GSTR_2B", index=False)
+                books.to_excel(writer, sheet_name="BOOKS", index=False)
+
+            
+  
+    
