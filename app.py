@@ -35,6 +35,44 @@ if "menu" not in st.session_state:
 
 
 st.set_page_config(page_title="Friday – Finance Assistant", layout="wide")
+# ======================
+# GLOBAL THEME (NEON DARK)
+# ======================
+
+st.markdown("""
+<style>
+
+.stApp {
+    background: linear-gradient(135deg,#0f172a,#0b1120);
+    color: white;
+}
+
+[data-testid="stMetric"] {
+    background-color: #111827;
+    border-radius: 15px;
+    padding: 15px;
+    box-shadow: 0 0 15px rgba(0,255,255,0.25);
+}
+
+.stButton>button {
+    background-color: #00F5FF;
+    color: black;
+    border-radius: 10px;
+    font-weight: bold;
+}
+
+.stDownloadButton>button {
+    background-color: #7C3AED;
+    color: white;
+    border-radius: 10px;
+}
+
+section[data-testid="stSidebar"] {
+    background-color: #0b1220;
+}
+
+</style>
+""", unsafe_allow_html=True)
 
 
 # ======================================================
@@ -100,8 +138,6 @@ if page == "History":
                     file_name=f
         )
 
-
-
 # ======================================================
 # HOME PAGE
 # ======================================================
@@ -116,7 +152,9 @@ if menu == "🏠 Home":
     import plotly.express as px
     import os
 
-    st.title("💼 Friday – Finance Automation Dashboard")
+    st.title("💼 Friday Finance Assistant")
+    st.caption("GST • TDS • Automation • Reconciliation")
+
 
     st.markdown("### 📊 GST Reconciliation Summary")
 
@@ -137,10 +175,11 @@ if menu == "🏠 Home":
 
         c1, c2, c3, c4 = st.columns(4)
 
-        c1.metric("Total Invoices", total)
-        c2.metric("Matched", matched)
-        c3.metric("Unmatched", unmatched)
-        c4.metric("Match %", f"{percent}%")
+        c1.metric("📄 Total Invoices", f"{total:,}")
+        c2.metric("✅ Matched", f"{matched:,}")
+        c3.metric("❌ Unmatched", f"{unmatched:,}")
+        c4.metric("🎯 Match %", f"{percent}%")
+
 
         # ======================
         # PIE CHART
@@ -151,7 +190,18 @@ if menu == "🏠 Home":
             "Count": [matched, unmatched]
         })
 
-        fig = px.pie(chart_df, names="Status", values="Count", hole=0.5)
+        fig = px.pie(
+        chart_df,
+        names="Status",
+        values="Count",
+        hole=0.6,
+        )
+
+        fig.update_layout(
+            paper_bgcolor="#0f172a",
+            font_color="white"
+        )
+
         st.plotly_chart(fig, use_container_width=True)
 
     else:
