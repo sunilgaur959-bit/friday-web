@@ -35,44 +35,83 @@ if "menu" not in st.session_state:
 
 
 st.set_page_config(page_title="Friday – Finance Assistant", layout="wide")
+
 # ======================
-# GLOBAL THEME (NEON DARK)
+# PROFESSIONAL BLACK THEME
 # ======================
 
 st.markdown("""
 <style>
 
+/* ===== BACKGROUND ===== */
 .stApp {
-    background: linear-gradient(135deg,#0f172a,#0b1120);
+    background-color: #000000;
     color: white;
 }
 
-[data-testid="stMetric"] {
-    background-color: #111827;
-    border-radius: 15px;
-    padding: 15px;
-    box-shadow: 0 0 15px rgba(0,255,255,0.25);
-}
-
-.stButton>button {
-    background-color: #00F5FF;
-    color: black;
-    border-radius: 10px;
-    font-weight: bold;
-}
-
-.stDownloadButton>button {
-    background-color: #7C3AED;
-    color: white;
-    border-radius: 10px;
-}
-
+/* ===== SIDEBAR ===== */
 section[data-testid="stSidebar"] {
-    background-color: #0b1220;
+    background-color: #0a0a0a;
+}
+
+/* ===== TEXT ===== */
+h1, h2, h3, h4, h5, h6, p, label, span, div {
+    color: white !important;
+}
+
+/* ===== KPI CARDS ===== */
+[data-testid="stMetric"] {
+    background-color: #111111;
+    border-radius: 14px;
+    padding: 18px;
+    border: 1px solid #222;
+    transition: 0.3s;
+}
+
+[data-testid="stMetric"]:hover {
+    box-shadow: 0 0 20px rgba(255,255,255,0.15);
+}
+
+/* ===== BUTTONS ===== */
+.stButton>button,
+.stDownloadButton>button {
+    background-color: white;
+    color: black;
+    border-radius: 8px;
+    font-weight: 600;
+    border: none;
+}
+
+/* ===== FILE UPLOADER ===== */
+[data-testid="stFileUploader"] {
+    background-color: #111;
+    border-radius: 12px;
+}
+
+/* ===== CURSOR SPILL EFFECT ===== */
+body::after {
+    content: "";
+    position: fixed;
+    width: 300px;
+    height: 300px;
+    pointer-events: none;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 60%);
+    transform: translate(-50%, -50%);
+    left: var(--x);
+    top: var(--y);
 }
 
 </style>
+
+<script>
+document.addEventListener("mousemove", (e) => {
+    document.body.style.setProperty('--x', e.clientX + 'px');
+    document.body.style.setProperty('--y', e.clientY + 'px');
+});
+</script>
 """, unsafe_allow_html=True)
+
 
 
 # ======================================================
